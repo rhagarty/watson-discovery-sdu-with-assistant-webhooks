@@ -122,7 +122,7 @@ Sample questions:
 
 * Results will be returned in Assistant context object:
 
-```json
+```
 { conversation_id: "b59b187a-f4b7-4fe7-81ef-29073abbb8ee",
   system: 
    { initialized: true,
