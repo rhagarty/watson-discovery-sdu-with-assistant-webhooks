@@ -1,4 +1,4 @@
-# composite-disco-sdu-assistant-chatbot-with-webhooks
+# watson-discovery-sdu-with-assistant-webhooks
 
 * Use Assistant dialog for better chatbot experience
 * Use "customer-care" skill provided by Assistant
@@ -6,7 +6,7 @@
 
 # What is a webhook?
 
-Define a webhook that sends a POST request callout to an external application to perform a programmatic function. You can then invoke the webhook from one or more dialog nodes.
+A webhook sends a POST request callout to an external application to perform a programmatic function. You can then invoke the webhook from one or more dialog nodes.
 
 A webhook is a mechanism that allows you to call out to an external program based on something happening in your program. When used in a dialog skill, a webhook is triggered when the assistant processes a node that has a webhook enabled. The webhook collects data that you specify or that you collect from the user during the conversation and save in context variables, and sends the data to the Webhook request URL as an HTTP POST request. The URL that receives the webhook is the listener. It performs a predefined action using the information that is provided by the webhook as specified in the webhook definition, and can optionally return a response.
 
@@ -22,31 +22,20 @@ A webhook is a mechanism that allows you to call out to an external program base
 * Remove references to calling Disco directly
 * Add action creds to .env
 * Create better use case for invoking action from a real Assistant dialog node
-* Format Disco results better in chatbot 
+* Format Disco results better in chatbot
+* Use Assistant V2 API
+
+# Prerequisites
+
+* Create Watson Discovery collection as described in https://github.com/rhagarty/watson-discovery-sdu-ui
+* Create Watson Assistant dialog skill as described in  https://github.com/rhagarty/watson-discovery-sdu-with-assistant-cloud-functions
+* Create Watson Cloud Function action as described in https://github.com/rhagarty/watson-discovery-sdu-with-assistant-cloud-functions
 
 # Steps:
 
-## Create action
-
-> Note: additional notes in https://github.com/rodalton/watson-functions
-
-* From IBM Cloud resource list, create `New` and select `Functions`.
-* Click on `Actions` tab.
-* `Create` and then `Create Action`.
-* Provide unique `Action Name`, keep default package, and select `Node.js 10` runtime.
-* Add code to action - use code in `/actions/disco-action.js`.
-
-![](doc/source/images/action-params.png)
-
-* Note your endpoint:
-
-![](doc/source/images/action-endpoint.png)
-
-* The `curl` command should work, if the params you entered are correct for the disco collection.
-
 ## Enable webhook from Assistant
 
-* Set up access to WebHook for this skill:
+* Set up access to WebHook for the skill you created previously:
 
 ![](doc/source/images/assistant-define-webhook.png)
 
@@ -66,15 +55,68 @@ A webhook is a mechanism that allows you to call out to an external program base
 
 ![](doc/source/images/assistant-context-vars.png)
 
-{"user":"7a4d1a77-2429-43b1-b6ed-a2b438e15bea","password":"RVVEdpPFLAuuTwFXjjKujPKY0hUOEzt6nQ6O7NwyonHeF7OdAm77Uc34GL2wQHDx"}
+{"user":"7a4d1a77-2429-xxxx-xxxx-a2b438e15bea","password":"RVVEdpPFLAuuTwFXjjKujPKY0hUOEztxxxxxxxxxonHeF7OdAm77Uc34GL2wQHDx"}
 
 These values are pulled from the `Functions` action panel, click on `API-KEY` which then takes you to the `API Key` panel, where the key is found:
 
 ```bash
-7a4d1a77-2429-43b1-b6ed-a2b438e15bea:RVVEdpPFLAuuTwFXjjKujPKY0hUOEzt6nQ6O7NwyonHeF7OdAm77Uc34GL2wQHDx
+7a4d1a77-2429-xxxx-xxxx-a2b438e15bea:RVVEdpPFLAuuTwFXjjKujPKY0hUOEztxxxxxxxxxonHeF7OdAm77Uc34GL2wQHDx
 ```
 
 > Note: the value before the `:` is the user, and after is the password. Do not include the `:` in either value.
+
+## Configure credentials
+
+```bash
+cp env.sample .env
+```
+
+Copy the `env.sample` file and rename it `.env` and update the `<***>` tags with the credentials from your Assistant service.
+
+#### `env.sample:`
+
+```bash
+# Copy this file to .env and replace the credentials with
+# your own before starting the app.
+
+# Watson Discovery
+ASSISTANT_WORKSPACE_ID=<add_assistant_workspace_id>
+ASSISTANT_IAM_APIKEY=<add_assistant_iam_apikey>
+
+# Run locally on a non-default port (default is 3000)
+# PORT=3000
+```
+
+Credentials can be found by clicking the Service Credentials tab, then the View Credentials option from the panel of your created Watson service.
+
+An additional `WORKSPACE_ID` value is required to access the Watson Assistant service. To get this value, select the `Manage` tab, then the `Launch tool` button from the panel of your Watson Assistance service. From the service instance panel, select the `Skills` tab to display the skills that exist for your service. For this tutorial, we will be using the `Custom Skill Sample Skill` that comes with the service:
+
+<p align="center">
+  <img width="300" src="doc/source/images/sample-skill.png">
+</p>
+
+Click the option button (highlighted in the image above) to view all of your skill details and service credentials:
+
+![](doc/source/images/sample-skill-creds.png)
+
+# Run locally
+
+```bash
+npm install
+npm start
+```
+
+Access the UI by pointing your browser at `localhost:3000`.
+
+Sample questions:
+
+* **how do I set a schedule?**
+* **how do I set the temperature?**
+* **how do I set the time?**
+
+# Sample Output
+
+![](doc/source/images/sample-output.png)
 
 ## Access to results in application
 
